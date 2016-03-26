@@ -1,0 +1,183 @@
+---
+title: "Codebook"
+author: "phbehre"
+date: "March 26, 2016"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+The following file describes the activities perfromed as part of the Getting and Cleaning Data Course Project and explains the run_analysis.R script. The script use data collected from the accelerometers from the Samsung Galaxy S smartphone. The data was collected in the context of the UCI Human Activity Recognition Using Smartphones Data Set. Please see more details on the project and the related dataset [here](http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones).
+
+Please find the dataset used via the following link [Project Dataset](https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip). After extracting the zip file, you can find detailed information  about the structure of the dataset in /UCI HAR Dataset/README.txt.
+
+run_analysis.R performs the following activities:
+
+## 0. Libraries used
+The script run_analysis.R uses the following libraries
+
+```{r}
+library(data.table)
+```
+
+
+## 1. Download the data 
+Downloads the original data set from the project [Project Dataset](https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip). 
+
+```{r}
+if(!file.exists("./data")){dir.create("./data")}
+fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
+download.file(fileUrl,destfile="./data/UCI_HAR_dataset.zip",method="curl")
+```
+
+## 2. Unzip the data file
+Unzips the file "UCI HAR Dataset.zip"
+
+```{r}
+unzip(zipfile="./data/UCI_HAR_dataset.zip",exdir="./data")
+```
+
+the folder should contain the follwoing files:
+
+```{r}
+path_data_files <- file.path("./data" , "UCI HAR Dataset")
+files<-list.files(path_data_files, recursive=TRUE)
+files
+```
+
+## 3. read data from files into data frames
+
+```{r}
+featureNames <- read.table("./data/UCI HAR Dataset/features.txt")
+activityLabels <- read.table("./data/UCI HAR Dataset/activity_labels.txt", header = FALSE)
+
+subjectTrain <- read.table("./data/UCI HAR Dataset/train/subject_train.txt", header = FALSE)
+activityTrain <- read.table("./data/UCI HAR Dataset/train/y_train.txt", header = FALSE)
+featuresTrain <- read.table("./data/UCI HAR Dataset/train/X_train.txt", header = FALSE)
+
+subjectTest <- read.table("./data/UCI HAR Dataset/test/subject_test.txt", header = FALSE)
+activityTest <- read.table("./data/UCI HAR Dataset/test/y_test.txt", header = FALSE)
+featuresTest <- read.table("./data/UCI HAR Dataset/test/X_test.txt", header = FALSE)
+```
+
+## 4. review the properties of the created variables
+
+```{r}
+str(subjectTrain)
+str(activityTrain) 
+str(featuresTrain)
+str(subjectTest) 
+str(activityTest)
+str(featuresTest)
+```
+
+# Merge the training and the test sets to create one data set
+
+## 5. Merge th data in training and test data sets corresponding to subject, activity and features.
+
+```{r}
+subject <- rbind(subjectTrain, subjectTest)
+activity <- rbind(activityTrain, activityTest)
+features <- rbind(featuresTrain, featuresTest)
+```
+
+## 6. set meaningful column names
+
+```{r}
+colnames(features) <- t(featureNames[2])
+
+colnames(activity) <- "Activity"
+colnames(subject) <- "Subject"
+```
+
+## 7. Merge complete data set
+merge the complete data set and review the head data of the variable "completeData"
+```{r}
+completeData <- cbind(features,activity,subject)
+head(completeData)
+```
+
+# Extracts only the measurements on the mean and standard deviation for each measurement.
+
+## 8. Compelte the dataset and extract only measurements on mean and standard deviation for the measurement.
+Identify and extract the column indices that have the mean and std in the name
+
+```{r}
+columnsWithMeanSTD <- grep(".*Mean.*|.*Std.*", names(completeData), ignore.case=TRUE)
+```
+
+Activity and Subject columns need to be added to the list.View the dimensions of "completeData".
+
+```{r}
+requiredColumns <- c(columnsWithMeanSTD, 562, 563)
+dim(completeData)
+```
+
+Generate the completed dataset "Data". View dimensions of the "Data".
+
+```{r}
+Data <- completeData[,requiredColumns]
+dim(Data)
+```
+# Uses descriptive activity names to name the activities in the data set
+
+## 9. Uses descriptive activity names to name the activities in the data set
+
+```{r}
+Data$Activity <- as.character(Data$Activity)
+for (i in 1:6){
+  Data$Activity[Data$Activity == i] <- as.character(activityLabels[i,2])
+}
+```
+
+Factor the activity variable after updating the variable names
+
+```{r}
+Data$Activity <- as.factor(Data$Activity)
+```
+
+# Appropriately labels the data set with descriptive variable names. 
+
+## 10. Replace the varibale names with more descriptive names
+
+```{r}
+# Appropriately labels the data set with descriptive variable names
+names(Data)<-gsub("Acc", "Accelerometer", names(Data))
+names(Data)<-gsub("Gyro", "Gyroscope", names(Data))
+names(Data)<-gsub("BodyBody", "Body", names(Data))
+names(Data)<-gsub("Mag", "Magnitude", names(Data))
+names(Data)<-gsub("^t", "Time", names(Data))
+names(Data)<-gsub("^f", "Frequency", names(Data))
+names(Data)<-gsub("tBody", "TimeBody", names(Data))
+names(Data)<-gsub("-mean()", "Mean", names(Data), ignore.case = TRUE)
+names(Data)<-gsub("-std()", "STD", names(Data), ignore.case = TRUE)
+names(Data)<-gsub("-freq()", "Frequency", names(Data), ignore.case = TRUE)
+names(Data)<-gsub("angle", "Angle", names(Data))
+names(Data)<-gsub("gravity", "Gravity", names(Data))
+```
+
+Review the names after updating
+
+```{r}
+names(Data)
+```
+
+# From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+
+## 11. Set "subject" as a factor variable
+
+```{r}
+Data$Subject <- as.factor(Data$Subject)
+Data <- data.table(Data)
+```
+
+## 12. Create tidy dataset and write it to file
+
+```{r}
+tidyDataset <- aggregate(. ~Subject + Activity, Data, mean)
+tidyDataset <- tidyDataset[order(tidyDataset$Subject,tidyDataset$Activity),]
+write.table(tidyDataset, file = "UCI_HAR_tidy_dataset.txt", row.names = FALSE)
+```
