@@ -1,4 +1,4 @@
-# library(data.table)
+library(data.table)
 # Download the data files and place them in a folder called "data". The file in the folder "UCI_HAR_dataset.zip" will include collected from the accelerometers from the Samsung Galaxy S smartphone.
 # For details on please visit the UCI site "Human Activity Recognition Using Smartphones Data Set"(http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones) from where this data was originally obtained
 # The script was created based on the dataset provided on 03/25/2016, please see the link used to obtain the data for any changes on the original dataset
@@ -75,6 +75,6 @@ Data <- data.table(Data)
 #From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject
 tidyDataset <- aggregate(. ~Subject + Activity, Data, mean)
 tidyDataset <- tidyDataset[order(tidyDataset$Subject,tidyDataset$Activity),]
-write.table(tidyData, file = "UCI_HAR_tidy_dataset.txt", row.names = FALSE)
+write.table(tidyDataset, file = "UCI_HAR_tidy_dataset.txt", row.names = FALSE)
 
 
