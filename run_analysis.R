@@ -42,10 +42,10 @@ completeData <- cbind(features,activity,subject)
 columnsWithMeanSTD <- grep(".*Mean.*|.*Std.*", names(completeData), ignore.case=TRUE)
 
 requiredColumns <- c(columnsWithMeanSTD, 562, 563)
-dim(completeData)
+
 
 Data <- completeData[,requiredColumns]
-dim(Data)
+
 
 # Uses descriptive activity names to name the activities in the data set 
 Data$Activity <- as.character(Data$Activity)
