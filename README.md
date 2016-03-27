@@ -6,6 +6,8 @@ Please find the dataset used via the following link [Project Dataset](https://d3
 
 The R script in this repository:
 
+__For detailled information, please see the file [Codebook.html](https://s3-us-west-2.amazonaws.com/phbehre-coursera-getting-data-project/codebook.html) (you can find the .Rmd and raw html version of the codebook in the github repo)__
+
 
 1. Downloads the original data set from the project [Project Dataset](https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip). 
 
