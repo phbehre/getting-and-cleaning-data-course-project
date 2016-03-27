@@ -15,7 +15,7 @@ The R script in this repository:
 5. Appropriately labels the data set with descriptive variable names. 
 6. From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
 
-For detailled information, please see the file [Codebook.html](https://s3-us-west-2.amazonaws.com/phbehre-coursera-getting-data-project/codebook.html) (you can find the .Rmd and raw html verison of the codebook in the github repo)
+__For detailled information, please see the file [Codebook.html](https://s3-us-west-2.amazonaws.com/phbehre-coursera-getting-data-project/codebook.html) (you can find the .Rmd and raw html version of the codebook in the github repo)__
 
 
 
